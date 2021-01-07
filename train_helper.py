@@ -7,8 +7,7 @@ import torch.nn.functional as F
 from model.mobile_net_v2 import MobileNet
 
 
-def main():
-    # Load dataset
+def prepare_dataset():
     transform = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
@@ -17,43 +16,33 @@ def main():
     ])
 
     train_set = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=128, shuffle=True, num_workers=1)
-
     test_set = torchvision.datasets.CIFAR100(root='./data', train=False, download=True, transform=transform)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=100, shuffle=False, num_workers=1)
 
-    # Model
-    net = MobileNet(n_class=100)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print(device)
-    net.to(device)
+    return train_set, test_set
 
-    # Optimizer and loss function
+
+def train(net, train_loader, device, path, num_epochs=200):
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.1,
-                          momentum=0.9, weight_decay=4e-5)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+    optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.9, weight_decay=4e-5)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs)
 
-    # Train
-    for epoch in range(200):
+    for epoch in range(num_epochs):
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             inputs, labels = data[0].to(device), data[1].to(device)
-
             optimizer.zero_grad()
-
             outputs = net(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-        print('[%d] loss: %.3f' %
-              (epoch + 1, running_loss / len(train_loader)))
+        print('[%d] loss: %.3f' % (epoch + 1, running_loss / len(train_loader)))
         scheduler.step()
 
-    torch.save(net.state_dict(), './sample_data/cifar100_net.pth')
+    torch.save(net.state_dict(), path)
 
-    # Test
+
+def test(net, test_loader, device):
     correct = 0
     total = 0
     with torch.no_grad():
@@ -64,9 +53,5 @@ def main():
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-    print('Accuracy of the network on the 10000 test images: %d %%' % (
+    print('Accuracy: %d %%' % (
             100 * correct / total))
-
-
-if __name__ == '__main__':
-    main()
