@@ -13,7 +13,7 @@ class MobileNet(nn.Module):
         self.bottleneck_cfg = [
             # t, c, n, s
             (1, 16, 1, 1),
-            (6, 24, 2, 2),
+            (6, 24, 2, 1),
             (6, 32, 3, 2),
             (6, 64, 4, 2),
             (6, 96, 3, 1),
@@ -34,7 +34,7 @@ class MobileNet(nn.Module):
 
         # First layer - conv2d
         self.features = [nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU6(inplace=True)
         )]
