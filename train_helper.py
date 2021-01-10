@@ -39,8 +39,6 @@ def train(net, train_loader, device, path, num_epochs=200):
         print('[%d] loss: %.3f' % (epoch + 1, running_loss / len(train_loader)))
         scheduler.step()
 
-    torch.save(net.state_dict(), path)
-
 
 def test(net, test_loader, device):
     correct = 0
@@ -53,5 +51,4 @@ def test(net, test_loader, device):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-    print('Accuracy: %d %%' % (
-            100 * correct / total))
+    print('Accuracy: %d %%' % (100 * correct / total))
