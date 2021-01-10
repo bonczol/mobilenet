@@ -9,7 +9,7 @@ class Committee:
         self.nets = nets
 
     def __call__(self, x):
-        y_pred = torch.stack([F.softmax(net(x)) for net in self.nets[:3]], dim=2)
+        y_pred = torch.stack([F.softmax(net(x)) for net in self.nets], dim=2)
         return torch.sum(y_pred, 2)
 
     def save(self, directory, filename):
