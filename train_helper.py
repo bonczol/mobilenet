@@ -51,4 +51,4 @@ def test(net, test_loader, device):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-    print('Accuracy: %d %%' % (100 * correct / total))
+    print('Accuracy: %f %%' % (100 * correct / total))
