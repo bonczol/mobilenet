@@ -38,6 +38,7 @@ def train(net, train_loader, device, path, num_epochs=200):
             running_loss += loss.item()
         print('[%d] loss: %.3f' % (epoch + 1, running_loss / len(train_loader)))
         scheduler.step()
+    torch.save(net.state_dict(), path)
 
 
 def test(net, test_loader, device):

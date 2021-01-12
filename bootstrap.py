@@ -26,6 +26,7 @@ def train_bs(train_set, test_set, device):
         net.to(device)
 
         train(net, train_loader, device, f'./trained/cifar_{n}.pth', num_epochs=EPOCHS)
+        net.eval()
         test(net, test_loader, device)
         nets.append(net.cpu())
 
